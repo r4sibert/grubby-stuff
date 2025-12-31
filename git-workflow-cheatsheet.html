@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Day‑to‑Day Git Workflow (Linux + GitHub) — Quick Reference</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #111827;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --accent: #60a5fa;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --code-bg: #0b1220;
+    --border: #1f2937;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+    line-height: 1.55;
+    margin: 0;
+    padding: 0;
+  }
+  .wrap {
+    max-width: 980px;
+    margin: 40px auto;
+    padding: 0 18px;
+  }
+  header {
+    background: linear-gradient(120deg, rgba(96,165,250,.12), rgba(52,211,153,.12));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: 1.9rem;
+    margin: 0 0 10px;
+    letter-spacing: .2px;
+  }
+  h2 {
+    margin-top: 28px;
+    font-size: 1.25rem;
+    color: #c7d2fe;
+  }
+  h3 {
+    margin-top: 22px;
+    font-size: 1.05rem;
+    color: #bfdbfe;
+  }
+  p, li {
+    color: var(--text);
+  }
+  .muted { color: var(--muted); }
+  .tip, .warn, .note {
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 14px 0;
+    background: var(--panel);
+  }
+  .tip     { border-left-color: var(--green); }
+  .warn    { border-left-color: var(--yellow); }
+  .note    { border-left-color: var(--accent); }
+  code, pre, kbd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: .95rem;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    overflow-x: auto;
+  }
+  .small { font-size: .92rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .toc {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+  }
+  ul { margin-top: 6px; }
+  hr {
+    border: none;
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+  .footer {
+    color: var(--muted);
+    font-size: .9rem;
+    margin-top: 28px;
+  }
+  .kbd {
+    background: #0f172a;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0 6px;
+    margin: 0 2px;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Day‑to‑Day Git Workflow (Linux + GitHub) — Quick Reference</h1>
+    <p class="muted">A compact, copy‑pasteable guide for working locally, syncing with GitHub, branching, and handling divergence safely.</p>
+  </header>
+
+  <nav class="toc">
+    <strong>Contents</strong>
+    <ul>
+      <li><a href="#preflight">0) Pre‑flight (once per repo)</a></li>
+      <li><a href="#startwork">1) Start work — pull first</a></li>
+      <li><a href="#edit">2) Edit files</a></li>
+      <li><a href="#stage">3) Stage changes</a></li>
+      <li><a href="#commit">4) Commit</a></li>
+      <li><a href="#push">5) Push</a></li>
+      <li><a href="#nextsession">6) Before next session</a></li>
+      <li><a href="#branches">Feature branches &amp; PRs</a></li>
+      <li><a href="#diverged">If histories diverge</a></li>
+      <li><a href="#checks">Handy checks</a></li>
+      <li><a href="#upstream">Set upstream (first push)</a></li>
+      <li><a href="#one-time">Optional one‑time config</a></li>
+    </ul>
+  </nav>
+
+  <section id="preflight">
+    <h2>0) Pre‑flight (once per repo)</h2>
+    <pre><code>cd /path/to/your/repo
+git status
+git branch                 # confirm current branch (assume: main)
+git remote -v              # confirm "origin" points to GitHub
+</code></pre>
+    <div class="note small">
+      <strong>Tip:</strong> If this branch hasn’t been pushed before, set its upstream once (see <a href="#upstream">Set upstream</a>).
+    </div>
+  </section>
+
+  <section id="startwork">
+    <h2>1) Start work — always pull first</h2>
+    <p>Keeps your local copy in sync with changes made on GitHub (including files added via the website).</p>
+    <pre><code>git fetch origin
+git pull --ff-only         # or: git pull --rebase (if you prefer linear history)
+</code></pre>
+    <div class="tip small">
+      <strong>Why <code>--ff-only</code>?</strong> It updates only if your branch can fast‑forward (you’re behind with no local commits). If histories diverged, it stops safely so you can choose merge or rebase.
+    </div>
+  </section>
+
+  <section id="edit">
+    <h2>2) Edit files</h2>
+    <pre><code>git status
+git diff                   # see unstaged changes
+</code></pre>
+  </section>
+
+  <section id="stage">
+    <h2>3) Stage changes</h2>
+    <pre><code>git add -p                 # interactively pick hunks
+# or:
+git add &lt;file&gt;
+git add .
+</code></pre>
+  </section>
+
+  <section id="commit">
+    <h2>4) Commit</h2>
+    <pre><code>git commit -m "Explain the what and why"
+# Need to tweak the last commit (not yet pushed)?
+git commit --amend
+</code></pre>
+  </section>
+
+  <section id="push">
+    <h2>5) Push</h2>
+    <pre><code>git push
+# First time on a new branch:
+git push -u origin &lt;branch&gt;
+</code></pre>
+  </section>
+
+  <section id="nextsession">
+    <h2>6) Before your next session</h2>
+    <p>If you also add files on GitHub’s website, pull at the start of each work session:</p>
+    <pre><code>git pull --ff-only         # or: git pull --rebase
+</code></pre>
+  </section>
+
+  <section id="branches">
+    <h2>Feature branches &amp; Pull Requests</h2>
+    <pre><code># create &amp; switch to a feature branch
+git switch -c feature/thing
+
+# work → stage → commit
+git add -p
+git commit -m "Implement thing"
+
+# publish the branch
+git push -u origin feature/thing
+
+# open a PR on GitHub (or with gh)
+# after it’s merged:
+git switch main
+git pull --ff-only
+git branch -d feature/thing
+git push origin --delete feature/thing   # remove remote branch
+</code></pre>
+  </section>
+
+  <section id="diverged">
+    <h2>If histories diverge</h2>
+    <p>You have local commits <em>and</em> the remote has new commits. Choose one style:</p>
+
+    <h3>A) Rebase (linear history)</h3>
+    <pre><code>git fetch origin
+git rebase origin/main
+# resolve conflicts → edit files → git add &lt;fixed&gt; → git rebase --continue
+git push
+# If this branch was already pushed before rebasing:
+# git push --force-with-lease
+</code></pre>
+
+    <h3>B) Merge (simple, no history rewrite)</h3>
+    <pre><code>git fetch origin
+git merge origin/main
+# resolve conflicts → git add &lt;fixed&gt; → git commit
+git push
+</code></pre>
+
+    <div class="warn small">
+      <strong>Destructive option:</strong> If you intend to discard local commits and match remote exactly:<br>
+      <code>git fetch origin</code><br>
+      <code>git reset --hard origin/main</code>
+    </div>
+  </section>
+
+  <section id="checks">
+    <h2>Handy checks</h2>
+    <pre><code>git log --oneline --graph --decorate --all   # visualize history
+git status                                   # current state
+git branch -vv                               # see tracking/upstream
+</code></pre>
+  </section>
+
+  <section id="upstream">
+    <h2>Set upstream (first push)</h2>
+    <pre><code>git push -u origin main
+# After this, future pushes/pulls can omit branch/remote.
+</code></pre>
+  </section>
+
+  <section id="one-time">
+    <h2>Optional one‑time config (global)</h2>
+    <pre><code># identity
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+
+# preferences
+git config --global init.defaultBranch main
+git config --global pull.rebase false      # or true if you prefer rebase
+git config --global core.editor "nano"     # or "vim", etc.
+</code></pre>
+    <div class="note small">
+      <strong>SSH recommended:</strong> generate a key with<br>
+      <code>ssh-keygen -t ed25519 -C "you@example.com"</code>, add the public key to GitHub (Settings → SSH and GPG keys), then test with <code>ssh -T git@github.com</code>.
+    </div>
+  </section>
+
+  <hr />
+  <p class="footer">
+    Keep this file handy. For deeper topics (rebasing pushed branches, conflict resolution strategies, GitHub CLI for PRs), extend this sheet as your habits solidify.
+  </p>
+</div>
+</body>
+</html>
