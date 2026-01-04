@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+input="${1}"
+
+if [[ -z "${input}" ]]; then 
+    echo "Please provide an argument."
+    exit 1
+fi
+
+if [[ -f "${input}" ]]; then
+    echo "${input} is a file."
+elif [[ -d "${input}" ]]; then
+    echo "${input} is a directory."
+else
+    echo "${input} is not a file or directory."
+fi
+
+
