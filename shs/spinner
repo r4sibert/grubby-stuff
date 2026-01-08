@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# 
+# An animated spinner.
+#
+# Directly ported from Dave Eddy
+# January 7, 2025
+# Ryan Sibert
 
 SPINNER_PID= # ensure pid is clear 
 DEBUG=false
