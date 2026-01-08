@@ -1,0 +1,4 @@
+echo "[$$] starting long command"
+sleep 5
+echo "[$$] finished long command"
+
