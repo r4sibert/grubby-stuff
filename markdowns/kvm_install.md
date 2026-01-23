@@ -1,6 +1,7 @@
+# KVM and Virtual Machine Setup
 
-# KVM and Virtual Machines
-
+## Revisions
+2026.01.21:: Revised kvm stack names
 
 ## Linux
 ### Install kvm packages
@@ -13,10 +14,10 @@
 
 2. Install the kvm stack -
     * qemu-kvm -- performs OS emulation
-    * libvirt -- includes libirtd server
-    * libvirt-client - contains the  `virsh` and other client utilities
-    * virt-install -- utility to install virtual machines
-    * virt-viewer -- utility to display VM GUI
+    * libvirt-daemon-system -- includes libirtd server
+    * libvirt-clients - contains the  `virsh` and other client utilities
+    * bridge-utils
+    * virt-manager
 
 
     ```
@@ -47,19 +48,46 @@
     ccp                   159744  1 kvm_amd
     ```
 
-### Install a virtual machine
+4. Set default URI in .bashrc
 
-1. Enable the `libvertd` daemon. This launches the daemon and enables the daemon on boot.
+    `export LIBVIRT_DEFAULT_URI=qemu:///system`
 
-    `$ systemctl enable --now libvirtd`
+5. Confirm NAT network interface.
 
-2. Download the distro iso and store it at:
+    '$ ip a show virbr0'
+
+Optional bridged networking for server/lab use (force libvirt to use br0):
+
+    ```
+    $ nmcli connection add type bridge ifname br0
+    $ nmcli connection add type ethernet slave-type bridge ifname eno1 master br0
+    ```
+
+### Download distro iso 
+
+Download your distro of choice and save the file to:
 
     `/var/lib/libvirt/images`
 
+This may require sudo access.
+
+### Install a virtual machine
+
+1. Enable and check the `libvertd` daemon. This launches the daemon and enables the daemon on boot.
+
+    ```
+    $ systemctl enable --now libvirtd
+    $ systemctl status libvirtd 
+    ```
+2. Grant user access to required groups.
+
+    ```
+    $ sudo usermod -aG libvirt,kvm $USER
+    $ groups
+    ```
 3. Install the VM.
 
-In this example, we create a Kali linux vm called `--name=kali` using 2 virtual cpus, 2Gb memory, and a 40 Gb virtual disk, from a disk image (*e.g.,* `kali-linux-2025.3-installer-amd64.iso`). This version of Kali is part of the Debian test distro. You can check which OS variants are supported with: `osinfo-query os`.
+Example Kali linux vm using 2 virtual cpus, 2Gb memory, and a 40 Gb virtual disk, from a disk image (*e.g.,* `kali-linux-2025.3-installer-amd64.iso`). This version of Kali is part of the Debian test distro. You can check which OS variants are supported with: `osinfo-query os`.
 
   ```
     $ sudo virt-install \
@@ -81,6 +109,11 @@ In this example, we create a Kali linux vm called `--name=kali` using 2 virtual 
 
     `$ sudo virsh start <your_vm>`
     `$ sudo virt-viewer <your_vm>`
+
+    or
+
+    `$ virt-viewer -c qemu:///system kali`
+
 
 3. Additional commands
 
