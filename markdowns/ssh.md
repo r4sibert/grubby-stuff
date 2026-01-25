@@ -1,4 +1,7 @@
 # Some SSH stuff
+## Revisions
+
+* 2026.01.23:: verified
 
 ## Server-side
 
