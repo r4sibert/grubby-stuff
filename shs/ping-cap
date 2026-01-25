@@ -1,0 +1,70 @@
+#!/usr/bin/env bash 
+
+# -------------------------------------------------
+# -------------------------------------------------
+# -------------------------------------------------
+# -------------------------------------------------
+# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#           p i n g    c a p t u r e
+# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# -------------------------------------------------
+# -------------------------------------------------
+# -------------------------------------------------
+# -------------------------------------------------
+
+# Revision log
+# -------------------------------------------------
+# 2026-01-24:: New script by RJS
+# 2026-01-25:: Added revision log and header
+# 2026-01-25:: Adjustments to output file structure,
+#              usage message and color scheme, flow
+#              control for arguments and directories.
+# 2026-01-25:: 
+
+
+
+# Global variables
+# -------------------------
+NAME="$1"
+DOMAIN="$2"
+
+# Fancy complainer function
+# -------------------------
+usage() {
+    local message=$(printf "\e[1;31mERROR: Missing argument ---------\e[0m\n")
+    local use=$(printf "\e[1;32mUSAGE: ping-cap [USERNAME] [DOMAIN]\e[0m\n")
+
+    cat <<-EOF
+
+    ${message}
+    
+    ${use}
+
+    Pings domain of choice and saves results
+    at USERNAME/yyyy-mm-dd-ping.log
+
+EOF
+    exit 1
+}
+
+# The business
+# -------------------------
+pinger() {
+    local fname="$NAME/$(date +'%Y-%m-%d')-ping.log"
+    echo "Username: $1" >> ${fname}
+    echo "Date: $(date)" >> ${fname}
+    ping -c 5 "${2}" | tee -a ${fname}
+    printf -- "------- END --------\n\n" >> ${fname}
+}
+
+
+# If not two user arguments, then complain
+# -------------------------
+[[ -z "$1" || -z "$2" ]] && { usage; exit 1; } 
+[[ -d "/${NAME}" ]] || { mkdir "${NAME}" 2>/dev/null; }
+
+echo ""
+pinger $NAME $DOMAIN
+echo ""
