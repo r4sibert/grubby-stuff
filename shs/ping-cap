@@ -42,8 +42,8 @@ usage() {
     
     ${use}
 
-    Pings domain of choice and saves results
-    at USERNAME/yyyy-mm-dd-ping.log
+    Pings [DOMAIN] 5 times and saves results
+    at [USERNAME]/yyyy-mm-dd-ping.log
 
 EOF
     exit 1
