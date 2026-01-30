@@ -30,7 +30,7 @@
 NAME="$1"
 DOMAIN="$2"
 
-# Fancy complainer function
+# Fancy complainer 
 # -------------------------
 usage() {
     local message=$(printf "\e[1;31mERROR: Missing argument ---------\e[0m\n")
@@ -63,7 +63,7 @@ pinger() {
 # If not two user arguments, then complain
 # -------------------------
 [[ -z "$1" || -z "$2" ]] && { usage; exit 1; } 
-[[ -d "/${NAME}" ]] || { mkdir "${NAME}" 2>/dev/null; }
+[[ -d "${NAME}" ]] || { mkdir "${NAME}"; }
 
 echo ""
 pinger $NAME $DOMAIN

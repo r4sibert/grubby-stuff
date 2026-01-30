@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+makedir() {
+    day="day_${1}"
+    mkdir "${day}"
+    touch "${day}/part_01" 
+    touch "${day}/part_02" 
+}
+
+makedir $1
